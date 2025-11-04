@@ -1,0 +1,4 @@
+Describe the average energy, valence, and danceability in terms of moods.
+
+Because just averaging ignores variety, mood shifts, context, time of year, or how often each track was played.
+Weight songs by play count, consider lyrics sentiment, or measure variability.
