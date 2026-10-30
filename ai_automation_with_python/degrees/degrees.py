@@ -15,7 +15,8 @@ def load_data(directory):
     # Load people
     with open(f"{directory}/people.csv", encoding="utf-8") as f:
         reader = csv.DictReader(f)
-        print(reader)
+        for row in reader:
+            print(row)
 
 def main():
     if len(sys.argv) > 2:
