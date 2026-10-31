@@ -62,13 +62,58 @@ def main():
 
     path = shortest_path(source, target)
 
+    if path is None:
+        print("Not connected")
+    else:
+        degrees = len(path)
+        print(f"{degrees} degrees of separation")
+        path = [(None, source)] + path
+        for i in range(degrees):
+            person1 = people[path[i][1]]['name']
+            person2 = people[path[i + 1][1]]['name']
+            movie = movies[path[i + 1][0]]["title"]
+            print(f"{i + 1}: {person1} and {person2} starred in {movie}")
+
 def shortest_path(source, target):
     """
-    returns the shortest list of (movie_id, person_id) pairs
+    Returns the shortest list of (movie_id, person_id) pairs
     that connect the source to the target.
-
-    if no possible path, return None.
     """
+    # Start with the source node
+    start = Node(state=source, parent=None, action=None)
+    # Create a frontier using QueueFrontier (BFS)
+    frontier = QueueFrontier()
+    frontier.add(start)
+    # Keep track of explored nodes
+    explored = set()
+    while True:
+        # If nothing is left in the frontier, no path exists
+        if frontier.empty():
+            return None
+        # Remove a node from the frontier
+        node = frontier.remove()
+        # Mark this node as explored
+        explored.add(node.state)
+        # Check if we reached the target
+        if node.state == target:
+            path = []
+            while node.parent is not None:
+                path.append((node.action, node.state))
+                node = node.parent
+
+            path.reverse()
+            return path
+        # Add neighbors to the frontier
+        for movie_id, person_id in neighbors_for_person(node.state):
+            if person_id not in explored and not frontier.contains_state(person_id):
+                child = Node(
+                    state=person_id,
+                    parent=node,
+                    action=movie_id
+                )
+
+                frontier.add(child)
+
 
 
 def person_id_for_name(name):
