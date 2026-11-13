@@ -10,66 +10,94 @@ const titleInput = document.getElementById("title-input");
 const dateInput = document.getElementById("date-input");
 const descriptionInput = document.getElementById("description-input");
 
-
 const taskData = [];
-const currentTask = {};
+let currentTask = {};
 
 const addOrUpdateTask = () => {
   const dataArrIndex = taskData.findIndex((item) => item.id === currentTask.id);
-
   const taskObj = {
     id: `${titleInput.value.toLowerCase().split(" ").join("-")}-${Date.now()}`,
     title: titleInput.value,
     date: dateInput.value,
-    description: descriptionInput.value
+    description: descriptionInput.value,
   };
 
   if (dataArrIndex === -1) {
-    taskData.unshift(taskObj)
+    taskData.unshift(taskObj);
+  } else {
+    taskData[dataArrIndex] = taskObj;
   }
 
   updateTaskContainer();
   reset();
-}
-
-const updateTaskContainer = () => {
-  tasksContainer.innerHTML = '';
-
-  taskData.forEach(({id, title, date, description}) => {
-    tasksContainer.innerHTML += `
-      <div class="task" id="${id}">
-        <p><strong>Title:</strong> ${title}</p>
-        <p><strong>Date:</strong> ${date}</p>
-        <p><strong>Description:</strong> ${description}</p>
-        <button type="submit" class="btn">Edit</button>
-        <button type="submit" class="btn">Delete</button>
-      </div>
-    `
-  });
-}
-
-const reset = () => {
-  taskForm.classList.toggle('hidden');
-  titleInput.value = '';
-  dateInput.value = '';
-  descriptionInput.value = '';
-  currentTask = {}
 };
 
+const updateTaskContainer = () => {
+  tasksContainer.innerHTML = "";
 
-openTaskFormBtn.addEventListener("click", () => {
+  taskData.forEach(({id, title, date, description}) => {
+      tasksContainer.innerHTML += `
+        <div class="task" id="${id}">
+          <p><strong>Title:</strong> ${title}</p>
+          <p><strong>Date:</strong> ${date}</p>
+          <p><strong>Description:</strong> ${description}</p>
+          <button onclick="editTask(this)" type="button" class="btn">Edit</button>
+          <button onclick="deleteTask(this)" type="button" class="btn">Delete</button>
+        </div>
+      `;
+    }
+  );
+};
+
+const deleteTask = (buttonEl) => {
+  const dataArrIndex = taskData.findIndex(
+    (item) => item.id === buttonEl.parentElement.id
+  );
+
+  buttonEl.parentElement.remove();
+  taskData.splice(dataArrIndex, 1);
+};
+
+const editTask = (buttonEl) => {
+  const dataArrIndex = taskData.findIndex(
+    (item) => item.id === buttonEl.parentElement.id
+  );
+
+  currentTask = taskData[dataArrIndex];
+
+  titleInput.value = currentTask.title;
+  dateInput.value = currentTask.date;
+  descriptionInput.value = currentTask.description;
+
+  addOrUpdateTaskBtn.innerText = "Update Task";
+
   taskForm.classList.toggle("hidden");
-});
+};
+
+const reset = () => {
+  titleInput.value = "";
+  dateInput.value = "";
+  descriptionInput.value = "";
+  taskForm.classList.toggle("hidden");
+  currentTask = {};
+};
+
+openTaskFormBtn.addEventListener("click", () =>
+  taskForm.classList.toggle("hidden")
+);
 
 closeTaskFormBtn.addEventListener("click", () => {
-  if (titleInput.value || dateInput.value || descriptionInput.value) {
+  const formInputsContainValues = titleInput.value || dateInput.value || descriptionInput.value;
+  const formInputValuesUpdated = titleInput.value !== currentTask.title || dateInput.value !== currentTask.date || descriptionInput.value !== currentTask.description;
+
+  if (formInputsContainValues && formInputValuesUpdated) {
     confirmCloseDialog.showModal();
   } else {
     reset();
   }
 });
 
-cancelBtn.addEventListener("click", () => confirmCloseDialog.closest());
+cancelBtn.addEventListener("click", () => confirmCloseDialog.close());
 
 discardBtn.addEventListener("click", () => {
   confirmCloseDialog.close();
@@ -77,14 +105,14 @@ discardBtn.addEventListener("click", () => {
 });
 
 taskForm.addEventListener("submit", (e) => {
-  console.log("form submited!")
   e.preventDefault();
 
   addOrUpdateTask();
-})
+});
 
 const myTaskArr = [
   { task: "Walk the Dog", date: "22-04-2022" },
   { task: "Read some books", date: "02-11-2023" },
   { task: "Watch football", date: "10-08-2021" },
 ];
+
