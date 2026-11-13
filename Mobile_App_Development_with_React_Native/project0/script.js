@@ -14,11 +14,46 @@ const descriptionInput = document.getElementById("description-input");
 const taskData = [];
 const currentTask = {};
 
+const addOrUpdateTask = () => {
+  const dataArrIndex = taskData.findIndex((item) => item.id === currentTask.id);
+
+  const taskObj = {
+    id: `${titleInput.value.toLowerCase().split(" ").join("-")}-${Date.now()}`,
+    title: titleInput.value,
+    date: dateInput.value,
+    description: descriptionInput.value
+  };
+
+  if (dataArrIndex === -1) {
+    taskData.unshift(taskObj)
+  }
+
+  updateTaskContainer();
+  reset();
+}
+
+const updateTaskContainer = () => {
+  tasksContainer.innerHTML = '';
+
+  taskData.forEach(({id, title, date, description}) => {
+    tasksContainer.innerHTML += `
+      <div class="task" id="${id}">
+        <p><strong>Title:</strong> ${title}</p>
+        <p><strong>Date:</strong> ${date}</p>
+        <p><strong>Description:</strong> ${description}</p>
+        <button type="submit" class="btn">Edit</button>
+        <button type="submit" class="btn">Delete</button>
+      </div>
+    `
+  });
+}
+
 const reset = () => {
   taskForm.classList.toggle('hidden');
   titleInput.value = '';
   dateInput.value = '';
   descriptionInput.value = '';
+  currentTask = {}
 };
 
 
@@ -45,30 +80,11 @@ taskForm.addEventListener("submit", (e) => {
   console.log("form submited!")
   e.preventDefault();
 
-  const dataArrIndex = taskData.findIndex((item) => item.id === currentTask.id);
-
-  const taskObj = {
-    id: `${titleInput.value.toLowerCase().split(" ").join("-")}-${Date.now()}`,
-    title: titleInput.value,
-    date: dateInput.value,
-    description: descriptionInput.value
-  };
-
-  if (dataArrIndex === -1) {
-    taskData.unshift(taskObj)
-  }
-
-  taskData.forEach(({id, title, date, description}) => {
-    tasksContainer.innerHTML += `
-      <div class="task" id="${id}">
-        <p><strong>Title:</strong> ${title}</p>
-        <p><strong>Date:</strong> ${date}</p>
-        <p><strong>Description:</strong> ${description}</p>
-        <button type="submit" class="btn">Edit</button>
-        <button type="submit" class="btn">Delete</button>
-      </div>
-    `
-  });
-
-  reset();
+  addOrUpdateTask();
 })
+
+const myTaskArr = [
+  { task: "Walk the Dog", date: "22-04-2022" },
+  { task: "Read some books", date: "02-11-2023" },
+  { task: "Watch football", date: "10-08-2021" },
+];
